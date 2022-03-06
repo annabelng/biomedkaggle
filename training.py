@@ -40,7 +40,7 @@ def train():
 
     # applying tokenizer to each row
     def encode(examples):
-        return tokenizer(examples['Text'], truncation=True, padding='max_length', max_length=512)
+        return tokenizer(examples['Text'], truncation=True, padding='max_length', max_length=512, is_split_into_words=True)
 
     # tokenizing text
     input_dataset = input_dataset.map(encode, batched=True)
