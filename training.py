@@ -2,7 +2,7 @@ from datasets import load_dataset
 import os
 from datetime import date
 import logging
-from transformers import AutoTokenizer, AutoModelForMaskedLM
+from transformers import AutoTokenizer, AutoModelForMaskedLM, Trainer, TrainingArguments
 #import torch.nn as nn
 import torch
 
@@ -31,10 +31,11 @@ def train():
         'test': basedir + '/data/test_label.csv'
         })
 
-    print(text_dataset)
+    print(input_dataset)
     print(label_dataset)
 
     # loading pubmedbert tokenizer
+    from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained("microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext")
 
     # applying tokenizer to each row
