@@ -21,12 +21,12 @@ def train():
     basedir = '/Users/annabelng/Personal Items/Personal/MAP/notebooks'
 
     # loading datasets from preprocessed csv files
-    input_dataset = load_dataset('csv', data_files = {
+    input_dataset = load_dataset('text', data_files = {
         'train': basedir + '/data/train_text.csv',
         'test': basedir + '/data/test_text.csv'
         })
 
-    label_dataset = load_dataset('csv', data_files = {
+    label_dataset = load_dataset('text', data_files = {
         'train': basedir + '/data/train_label.csv',
         'test': basedir + '/data/test_label.csv'
         })
@@ -40,10 +40,20 @@ def train():
 
     # applying tokenizer to each row
     def encode(examples):
-        return tokenizer(examples['Text'], truncation=True, padding='max_length', max_length=512, is_split_into_words=True)
+        return tokenizer(examples['text'], truncation=True, padding='max_length', max_length=512)
+
+    print(input_dataset)
+    print(label_dataset)
 
     # tokenizing text
-    input_dataset = input_dataset.map(encode)
+    input_dataset = input_dataset.map(encode, batched = True)
+
+    # tokenizing text
+    #train_text = input_dataset['train']['Text']
+    #test_text = input_dataset['test']['Text']
+
+    #train_encodings = tokenizer(train_text, truncation = True, padding = 'max_length', max_length=512)
+    #input_dataset['test'] = input_dataset['test'].map(encode, batched = True)
 
     # training model on tokenized and split data
     import torch
