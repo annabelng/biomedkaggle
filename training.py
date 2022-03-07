@@ -3,7 +3,7 @@ import os
 from datetime import date
 import logging
 from transformers import AutoTokenizer, AutoModelForMaskedLM, Trainer, TrainingArguments
-#import torch.nn as nn
+import torch.nn as nn
 import torch
 
 class WeightedTrainer(Trainer):
@@ -18,6 +18,8 @@ class WeightedTrainer(Trainer):
         return self.loss_fn(outputs[0], labels)
 
 def train():
+    log = logging.getLogger(__name__)
+
     basedir = '/Users/annabelng/Personal Items/Personal/MAP/notebooks'
 
     # loading datasets from preprocessed csv files
@@ -93,6 +95,10 @@ def train():
             'auroc': roc,
         }
 
+    o_dir = basedir + '/jobs'
+    log_dir = o_dir + '/logs'
+    #os.makedirs(log_dir, exist_ok=True)
+
     training_args = TrainingArguments(
         output_dir=o_dir,          # output directory
         num_train_epochs=3,              # total number of training epochs
@@ -104,7 +110,7 @@ def train():
         logging_steps=100,
         evaluation_strategy='steps',
         learning_rate=2e-5,
-        fp16=True,
+
         save_total_limit=5,
         eval_steps=2000,
         save_steps=2000,
@@ -115,7 +121,6 @@ def train():
         model=model,                         # the instantiated 🤗 Transformers model to be trained
         args=training_args,                  # training arguments, defined above
         train_dataset=train_dataset,         # training dataset
-        eval_dataset=val_dataset,             # evaluation dataset
         compute_metrics=compute_metrics,
     )
 
