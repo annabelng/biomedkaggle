@@ -37,8 +37,11 @@ def train():
     print(label_dataset)
 
     # loading pubmedbert tokenizer
-    from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext")
+    #from transformers import AutoTokenizer
+    #tokenizer = AutoTokenizer.from_pretrained("microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext")
+
+    from transformers import DistilBertTokenizerFast
+    tokenizer = DistilBertTokenizerFast.from_pretrained('emilyalsentzer/Bio_ClinicalBERT')
 
     # applying tokenizer to each row
     def encode(examples):
@@ -76,8 +79,11 @@ def train():
     train_dataset = Dataset(input_dataset['train'], label_dataset['train'])
     test_dataset = Dataset(input_dataset['test'], label_dataset['test'])
 
-    from transformers import AutoTokenizer, AutoModelForMaskedLM
-    model = AutoModelForMaskedLM.from_pretrained("microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext")
+    #from transformers import AutoTokenizer, AutoModelForMaskedLM
+    #model = AutoModelForMaskedLM.from_pretrained("microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext")
+
+    from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments
+    model = DistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased")
 
     from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
 
