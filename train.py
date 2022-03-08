@@ -28,7 +28,7 @@ def train():
 
     # loading pubmedbert tokenizer
     from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext")
+    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
 
     # applying tokenizer to each row
     def encode(examples):
