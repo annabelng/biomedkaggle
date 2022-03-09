@@ -39,8 +39,8 @@ train = result.sample(frac=0.8,random_state=200)
 test = result.drop(train.index).sample(frac=1.0)
 
 # grabbing gene class for test and train
-train_gene = train.filter(['Class'], axis=1)
-test_gene = test.filter(['Class'], axis=1)
+train_gene = train.filter(['Class'], axis=1)-1
+test_gene = test.filter(['Class'], axis=1)-1
 
 # grabbing text for test and train
 train_text = train.filter(['Text'], axis = 1)

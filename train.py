@@ -9,8 +9,10 @@ import torch
 # load datasets
 
 def train():
-    # loading datasets from preprocessed csv files
+    # loading logger
+    log = logging.getLogger(__name__)
 
+    # loading datasets from preprocessed csv files
     basedir = '/Users/annabelng/Personal Items/Personal/MAP/notebooks'
 
     input_dataset = load_dataset('text', data_files = {
@@ -63,12 +65,14 @@ def train():
     model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=9)
 
     training_args = TrainingArguments(
-    output_dir="./results",
-    learning_rate=2e-5,
-    per_device_train_batch_size=16,
-    per_device_eval_batch_size=16,
-    num_train_epochs=5,
-    weight_decay=0.01,
+        output_dir="./results",
+        logging_dir = './logs',
+        logging_steps = 100,
+        learning_rate=2e-5,
+        per_device_train_batch_size=16,
+        per_device_eval_batch_size=16,
+        num_train_epochs=5,
+        weight_decay=0.01,
     )
 
     trainer = Trainer(
