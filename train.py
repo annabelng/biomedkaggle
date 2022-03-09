@@ -13,7 +13,9 @@ def train():
     log = logging.getLogger(__name__)
 
     # loading datasets from preprocessed csv files
-    basedir = '/Users/annabelng/Personal Items/Personal/MAP/notebooks'
+    #basedir = '/Users/annabelng/Personal Items/Personal/MAP/notebooks'
+    basedir = os.getcwd()
+    #datadir = basedir + '/data'
 
     input_dataset = load_dataset('text', data_files = {
         'train': basedir + '/data/train_text.csv',
