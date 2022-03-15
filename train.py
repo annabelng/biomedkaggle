@@ -32,7 +32,9 @@ def train():
 
     # loading pubmedbert tokenizer
     from transformers import AutoTokenizer
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+    #tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
+    tokenizer = AutoTokenizer.from_pretrained("blizrys/biobert-v1.1-finetuned-pubmedqa")
+    #tokenizer = AutoTokenizer.from_pretrained("dmis-lab/biobert-large-cased-v1.1-mnli")
 
     # applying tokenizer to each row
     def encode(examples):
@@ -64,7 +66,26 @@ def train():
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
     from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
-    model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=9)
+    #model = AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=9)
+    model = AutoModelForSequenceClassification.from_pretrained("blizrys/biobert-v1.1-finetuned-pubmedqa", num_labels=9)
+    #model = AutoModelForSequenceClassification.from_pretrained("dmis-lab/biobert-large-cased-v1.1-mnli")
+
+
+    from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
+
+    def compute_metrics(pred):
+        labels = pred.label_ids
+        preds = pred.predictions.argmax(-1)
+        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='binary')
+        acc = accuracy_score(labels, preds)
+        roc = roc_auc_score(labels, pred.predictions[:,-1])
+        return {
+            'accuracy': acc,
+            'f1': f1,
+            'precision': precision,
+            'recall': recall,
+            'auroc': roc,
+        }
 
     training_args = TrainingArguments(
         output_dir="./results",
@@ -74,16 +95,18 @@ def train():
         per_device_train_batch_size=16,
         per_device_eval_batch_size=16,
         num_train_epochs=5,
-        weight_decay=0.01,
+        weight_decay=0.1,
+        save_total_limit = 5,
     )
 
     trainer = Trainer(
-    model=model,
-    args=training_args,
-    train_dataset= train_dataset,
-    eval_dataset = test_dataset,
-    tokenizer=tokenizer,
-    data_collator=data_collator,
+        model=model,
+        args=training_args,
+        train_dataset= train_dataset,
+        eval_dataset = test_dataset,
+        tokenizer=tokenizer,
+        data_collator=data_collator,
+        compute_metrics = compute_metrics,
     )
 
     trainer.train()
