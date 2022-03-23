@@ -1,10 +1,12 @@
-from datasets import load_dataset
+from datasets import load_dataset, load_metric
 import os
 from datetime import date
 import logging
 from transformers import AutoTokenizer, AutoModelForMaskedLM, Trainer, TrainingArguments
 import torch.nn as nn
 import torch
+import numpy as np
+
 
 # load datasets
 
@@ -61,6 +63,7 @@ def train():
 
     train_dataset = Dataset(input_dataset['train'], label_dataset['train'])
     test_dataset = Dataset(input_dataset['test'], label_dataset['test'])
+    metric = load_metric("accuracy")
 
     from transformers import DataCollatorWithPadding
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
@@ -71,21 +74,15 @@ def train():
     #model = AutoModelForSequenceClassification.from_pretrained("dmis-lab/biobert-large-cased-v1.1-mnli")
 
 
-    from sklearn.metrics import accuracy_score, precision_recall_fscore_support, roc_auc_score
+    import sklearn.metrics as metrics
 
-    def compute_metrics(pred):
-        labels = pred.label_ids
-        preds = pred.predictions.argmax(-1)
-        precision, recall, f1, _ = precision_recall_fscore_support(labels, preds, average='binary')
-        acc = accuracy_score(labels, preds)
-        roc = roc_auc_score(labels, pred.predictions[:,-1])
-        return {
-            'accuracy': acc,
-            'f1': f1,
-            'precision': precision,
-            'recall': recall,
-            'auroc': roc,
-        }
+    def compute_metrics(eval_pred):
+        predictions, labels = eval_pred
+        predictions = np.argmax(predictions, axis=1)
+        return metric.compute(predictions=predictions, references=labels)
+    
+    def model_init():
+        return AutoModelForSequenceClassification.from_pretrained("distilbert-base-uncased", num_labels=9)
 
     training_args = TrainingArguments(
         output_dir="./results",
@@ -97,18 +94,21 @@ def train():
         num_train_epochs=5,
         weight_decay=0.1,
         save_total_limit = 5,
+        metric_for_best_model='accuracy'
     )
 
     trainer = Trainer(
-        model=model,
+        model_init = model_init,
         args=training_args,
         train_dataset= train_dataset,
         eval_dataset = test_dataset,
         tokenizer=tokenizer,
         data_collator=data_collator,
+        compute_metrics = compute_metrics,
     )
 
-    trainer.train()
+    best_run = trainer.hyperparameter_search(n_trials=5, direction="maximize")
+    #trainer.train()
 
 if __name__ == "__main__":
     train()
