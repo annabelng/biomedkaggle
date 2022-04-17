@@ -9,6 +9,7 @@ datadir = basedir + '/data'
 
 # reading the gene variants
 data = pd.read_csv(datadir + '/training_variants.zip')
+data['Class'] -= 1
 
 # reading the training text
 data_text = pd.read_csv(datadir + '/training_text.zip', sep = '\|\|', names = ["ID","Text"],skiprows = 1)
@@ -22,7 +23,7 @@ def preprocess(total_text, index, column):
         total_text = total_text.lower()
 
         data_text[column][index] = total_text
-
+    
 no_text = []
 for index, row in data_text.iterrows():
     if type(row['Text']) is str:
@@ -39,8 +40,8 @@ train = result.sample(frac=0.8,random_state=200)
 test = result.drop(train.index).sample(frac=1.0)
 
 # grabbing gene class for test and train
-train_gene = train.filter(['Class'], axis=1)-1
-test_gene = test.filter(['Class'], axis=1)-1
+train_gene = train.filter(['Class'], axis=1)
+test_gene = test.filter(['Class'], axis=1)
 
 # grabbing text for test and train
 train_text = train.filter(['Text'], axis = 1)

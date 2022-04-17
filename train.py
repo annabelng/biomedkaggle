@@ -107,7 +107,7 @@ def train():
         compute_metrics = compute_metrics,
     )
 
-    best_run = trainer.hyperparameter_search(n_trials=3, direction="maximize")
+    best_run = trainer.hyperparameter_search(n_trials=5, direction="maximize")
     #trainer.train()
 
 if __name__ == "__main__":

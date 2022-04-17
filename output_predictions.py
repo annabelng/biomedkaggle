@@ -17,7 +17,7 @@ def predict(args):
 
 
     from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer 
-    model = AutoModelForSequenceClassification.from_pretrained('/home/biomedkaggle/results/checkpoint-1500')
+    model = AutoModelForSequenceClassification.from_pretrained('/home/biomedkaggle/results/run-1/checkpoint-500')
     #model = AutoModelForSequenceClassification.from_pretrained("blizrys/biobert-v1.1-finetuned-pubmedqa", num_labels=9)
     #model = DistilBertForSequenceClassification.from_pretrained('/home/biomedkaggle/results/checkpoint-1500')
     #from transformers import Trainer, TrainingArguments
@@ -71,13 +71,12 @@ def predict(args):
 
     # softmax each row so each row sums to 1
     prob = softmax(pred, axis = 1)
+    labels = np.argmax(prob,axis =1)
 
     # write the probabilities out to text file
     with open(args.output,'w') as f:
-        for row in prob:
-            for column in row:
-                f.write(str(column))
-                f.write(" ")
+        for row in labels:
+            f.write(str(row))
             f.write('\n')
             
 
